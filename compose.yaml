@@ -3,7 +3,7 @@ version: "3.9"
 services:
   frontend:
     container_name: frontend
-    image: frontend
+    image: nextjs
     build: 
       context: ./frontend
       dockerfile: frontend.dockerfile
@@ -16,7 +16,7 @@ services:
       - backend
   backend:
     container_name: backend
-    image: backend
+    image: expressjs
     build:
       context: ./backend
       dockerfile: backend.dockerfile
@@ -24,6 +24,17 @@ services:
       - 4000:4000
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres?schema=public
+  webserver:
+    container_name: webserver
+    image: nginx:1.15.12-alpine
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./config:/etc/nginx/conf.d
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /tmp/acme_challenge:/tmp/acme_challenge
   db:
     container_name: db
     image: postgres:12
